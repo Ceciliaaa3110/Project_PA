@@ -120,17 +120,22 @@ Docker Desktop installato
 ### Avvio
 
 Il progetto si avvia tramite **Docker Compose**, effettuando la procedura seguente: 
-1. clonazione del repository con il comando
+1. clonare il repository con il comando
 
 ```bash
 git clone https://github.com/Ceciliaaa3110/Project_PA.git
 ```
-2. generazione del'immagine docker dell'applicazione con il comando e avvio
+2. Entrare nella cartella del progetto
+```bash
+cd Project_PA
+```
+
+3. generare l'immagine docker dell'applicazione con il comando e avvio
 
 ```bash
 docker compose up --build
 ```
-3. apertura di **Postman** per importare la collection `ProjectPA.postman_collection.json`
+4. aprire **Postman** e importare la collection `ProjectPA.postman_collection.json`
 
 ## Configurazione
 

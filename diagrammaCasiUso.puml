@@ -1,0 +1,40 @@
+@startuml diagrammaCasiUso
+left to right direction
+
+actor "Traffic Simulator" as Client
+actor "Amministratore" as Admin
+
+rectangle "Sistema di rilevamento anomalie di traffico" {
+
+  usecase "Invia dati\ndi traffico" as UC1
+  usecase "Valida richiesta" as UC2
+  usecase "Classifica traffico" as UC3
+  usecase "Produce decisione\noperativa" as UC4
+  usecase "Salva analisi" as UC5
+  usecase "Blocca temporaneamente\nun IP" as UC6
+
+  usecase "Login" as UC7
+  usecase "Consulta statistiche\ncache" as UC8
+  usecase "Consulta storico\nanalisi" as UC9
+  usecase "Svuota cache" as UC10
+}
+
+Client --> UC1
+
+UC1 ..> UC2 : <<include>>
+UC1 ..> UC3 : <<include>>
+UC3 ..> UC4 : <<include>>
+UC4 ..> UC5 : <<include>>
+UC4 ..> UC6 : <<extend>>
+
+Admin --> UC7
+Admin --> UC8
+Admin --> UC9
+Admin --> UC10
+
+UC8 ..> UC7 : <<include>>
+UC9 ..> UC7 : <<include>>
+UC10 ..> UC7 : <<include>>
+
+@enduml
+```

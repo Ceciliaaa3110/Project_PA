@@ -1,0 +1,33 @@
+@startuml sequenzaAdminAnalysis
+title Rotta /api/admin/analysis
+
+actor "Admin/Postman" as Admin
+participant "adminRoutes" as Route
+participant "authMiddleware" as Auth
+participant "roleMiddleware" as Role
+participant "AdminController" as Controller
+participant "TrafficAnalysisRepository" as Repo
+database "SQLite\nTrafficAnalyses" as DB
+
+Admin -> Route : GET /api/admin/analysis\nBearer Token
+Route -> Auth : verifica JWT
+
+alt Token mancante/non valido
+    Auth --> Admin : 401 Unauthorized
+else Token valido
+    Auth -> Role : next()\nreq.user = decoded token
+    Role -> Role : controlla ruolo ADMIN
+
+    alt Ruolo non autorizzato
+        Role --> Admin : 403 Permessi insufficienti
+    else Ruolo ADMIN
+        Role -> Controller : next()
+        Controller -> Repo : findAll()
+        Repo -> DB : SELECT TrafficAnalyses
+        DB --> Repo : lista analisi
+        Repo --> Controller : lista analisi
+        Controller --> Admin : 200 OK + analisi
+    end
+end
+
+@enduml

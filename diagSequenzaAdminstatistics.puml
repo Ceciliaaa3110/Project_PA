@@ -1,0 +1,30 @@
+@startuml sequenzaAdminStatistics
+title Rotta /api/admin/statistics
+
+actor "Admin/Postman" as Admin
+participant "adminRoutes" as Route
+participant "authMiddleware" as Auth
+participant "roleMiddleware" as Role
+participant "AdminController" as Controller
+participant "CacheManagerService" as Cache
+
+Admin -> Route : GET /api/admin/statistics\nBearer Token
+Route -> Auth : verifica JWT
+
+alt Token mancante/non valido
+    Auth --> Admin : 401 Unauthorized
+else Token valido
+    Auth -> Role : next()\nreq.user = decoded token
+    Role -> Role : controlla ruolo ADMIN
+
+    alt Ruolo non autorizzato
+        Role --> Admin : 403 Permessi insufficienti
+    else Ruolo ADMIN
+        Role -> Controller : next()
+        Controller -> Cache : getAllStatistics()
+        Cache --> Controller : statistiche cache
+        Controller --> Admin : 200 OK + statistiche
+    end
+end
+
+@enduml

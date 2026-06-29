@@ -1,0 +1,57 @@
+@startuml sequenzaDetection
+title Rotta /api/detection
+
+actor "Traffic Simulator/Postman" as Client
+participant "detectionRoutes" as Route
+participant "validationMiddleware" as Validation
+participant "DetectionController" as Controller
+participant "DetectionService" as Service
+participant "CacheManagerService" as Cache
+participant "RuleBasedClassifier" as Classifier
+participant "DecisionService" as Decision
+participant "TrafficAnalysisRepository" as AnalysisRepo
+participant "BlockedIpRepository" as BlockedRepo
+database "SQLite" as DB
+
+Client -> Route : POST /api/detection\nsourceIp, packets, bytes, synPacketsCount
+Route -> Validation : valida campi richiesta
+
+alt Campi mancanti
+    Validation --> Client : 400 Campi mancanti
+else Campi presenti
+    Validation -> Controller : next()
+    Controller -> Service : analyze(data)
+
+    Service -> Cache : isBlocked(sourceIp)
+
+    alt IP già bloccato in cache
+        Cache --> Service : true
+        Service --> Controller : BLOCKED + TEMP_BLOCK
+        Controller --> Client : 200 OK + response
+    else IP non bloccato
+        Cache --> Service : false
+        Service -> Cache : updateRequestCount(sourceIp)
+
+        Service -> Classifier : classify(data)
+        Classifier --> Service : classification
+
+        Service -> Decision : decide(classification)
+        Decision --> Service : decision
+
+        Service -> AnalysisRepo : save(data, classification, decision)
+        AnalysisRepo -> DB : INSERT TrafficAnalyses
+        DB --> AnalysisRepo : OK
+
+        alt decision == TEMP_BLOCK
+            Service -> Cache : blockTemporarily(sourceIp)
+            Service -> BlockedRepo : save(sourceIp, reason)
+            BlockedRepo -> DB : INSERT BlockedIps
+            DB --> BlockedRepo : OK
+        end
+
+        Service --> Controller : classification + decision
+        Controller --> Client : 200 OK + JSON response
+    end
+end
+
+@enduml

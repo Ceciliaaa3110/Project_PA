@@ -1,0 +1,27 @@
+@startuml sequenzaLogin
+title Rotta /api/auth/login
+
+actor "Admin/Postman" as Client
+participant "authRoutes" as Route
+participant "AuthController" as Controller
+participant "AuthService" as Service
+participant "UserRepository" as Repo
+database "SQLite\nUsers" as DB
+
+Client -> Route : POST /api/auth/login\nusername, password
+Route -> Controller : login(req, res)
+Controller -> Service : login(username, password)
+Service -> Repo : findByUsername(username)
+Repo -> DB : SELECT user
+DB --> Repo : user
+Repo --> Service : user
+
+alt Credenziali valide
+    Service --> Controller : JWT token
+    Controller --> Client : 200 OK + token
+else Credenziali non valide
+    Service --> Controller : errore login
+    Controller --> Client : 401 Unauthorized
+end
+
+@enduml

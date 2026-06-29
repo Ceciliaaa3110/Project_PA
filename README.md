@@ -123,7 +123,7 @@ Il progetto si avvia tramite **Docker Compose**, effettuando la procedura seguen
 1. clonazione del repository con il comando
 
 ```bash
-git clone #URL DA METTERE DEL repository
+git clone https://github.com/Ceciliaaa3110/Project_PA.git
 ```
 2. generazione del'immagine docker dell'applicazione con il comando e avvio
 

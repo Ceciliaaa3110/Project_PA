@@ -1,0 +1,17 @@
+services:
+  backend:
+    build: .
+    container_name: project_pa_backend
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+
+  # services è la sezioneche  apre l'elenco dei container da usare.
+  # Il progetto prevede un solo container: quello del backend.
+  # Nello specifico il backend viene definito come unico servizio, con le seguenti caratteristiche: 
+  # - deve essere costruito da Docker Compose seguendo le specifiche indicate dal Dockerfile presente nella cartella corrente (.)
+  # - deve avere nome "project_pa_backend"
+  # - la porta del computer deve essere collegata alla stessa del container (3000:3000): la richiesta inviata di forma localhost:3000 
+  #   viene quindi inoltrata al backend in esecuzione nel container
+  # - deve leggere il file .env e caricare automaticamente tutte le variabili d'ambiente necessarie all'applicazione

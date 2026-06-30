@@ -129,16 +129,29 @@ git clone https://github.com/Ceciliaaa3110/Project_PA.git
 ```bash
 cd Projeect_PA
 ```
-3. entrare nella cartella del backend, per raggiungere il file docker-compose.yml
+3. entrare nella cartella del backend, per raggiungere il file `docker-compose.yml`
 ```bash
 cd backend
 ```
-4. generare l'immagine docker dell'applicazione con il comando e avvio
+4. generare l'immagine docker dell'applicazione, ricostruendola senza usare la cache
 
 ```bash
-docker compose up --build
+docker compose build --no-cache
 ```
-4. aprire **Postman** e importare la collection `ProjectPA.postman_collection.json`
+4. avvio dei servizi definiti nel file `docker-compose.yml`
+```bash
+docker compose up
+```
+
+Quindi aprire un secondo terminale, posizionandosi nella cartella `backend`, per poi eseguire il simulatore di traffico
+```bash
+npm run simulate
+```
+Aprire **Postman** e importare la collection `ProjectPA.postman_collection.json`: da Postman è possibile inviare le richieste agli endpoint dell'applicazione.
+
+
+
+
 
 ## Configurazione
 

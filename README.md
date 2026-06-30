@@ -101,7 +101,7 @@ Il progetto adotta diversi pattern software al fine di garantire separazione del
   Gli esempi di Repository Pattern sono applicati nelle seguenti fasi:
 
   - autenticazione
-     in quanto l'`AuthService.ts` non esegue direttamente il metodo `User.findOne()`, quindi non accede al modello Sequelize `User`per individuare l'utente sul database, ma chiama `UserRepository.findByUsername()`
+     in quanto l'`AuthService.ts` non interroga direttamente il database tramite il modello Sequelize `User.findOne()`, ma delega la ricerca dell'utente al metodo `UserRepository.findByUsername()` (che incapsula al proprio interno l'utilizzo del modello Sequelize)
 
   - rilevamento degli attacchi (detection)
      in quanto il `DetectionService.ts` delega le operazioni di persistenza ai repository `TrafficAnalysisRepository.ts` e `BlockedIpRepository.ts`, che utilizzano i rispettivi modelli Sequelize per eseguire le operazioni di lettura e scrittura sul database

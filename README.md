@@ -125,12 +125,15 @@ Il progetto si avvia tramite **Docker Compose**, effettuando la procedura seguen
 ```bash
 git clone https://github.com/Ceciliaaa3110/Project_PA.git
 ```
-2. Entrare nella cartella del progetto
+2. entrare nella cartella del progetto
 ```bash
-cd Project_PA
+cd Projeect_PA
 ```
-
-3. generare l'immagine docker dell'applicazione con il comando e avvio
+3. entrare nella cartella del backend, per raggiungere il file docker-compose.yml
+```bash
+cd backend
+```
+4. generare l'immagine docker dell'applicazione con il comando e avvio
 
 ```bash
 docker compose up --build

@@ -68,7 +68,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"sourceIp\": \"192.168.1.15\",\n    \"packets\": 0,\n    \"bytes\": 0,\n    \"synPacketsCount\": 0\n\n}",
+              "raw": "{\n    \"sourceIp\": \"192.168.1.18\",\n    \"packets\": 0,\n    \"bytes\": 0,\n    \"synPacketsCount\": 0\n\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -218,6 +218,44 @@
             "body": {
               "mode": "raw",
               "raw": "{\n    \"sourceIp\": \"192.168.1.7\",\n    \"bytes\": 14800000,\n    \"synPacketsCount\": 0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/detection",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "detection"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:3000/api/detection BruteForce",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "prova",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"sourceIp\": \"192.168.1.16\",\n    \"packets\": 0,\n    \"bytes\": 0,\n    \"synPacketsCount\": 1\n\n}",
               "options": {
                 "raw": {
                   "language": "json"

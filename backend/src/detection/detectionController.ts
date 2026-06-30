@@ -1,4 +1,4 @@
-import { Request, Response } from "express"; // import delle interfacce 2 interfacce fornite da Express
+import { Request, Response, NextFunction } from "express"; // import delle 3 interfacce fornite da Express
 import DetectionService from "../detection/DetectionService"; // import del servizio che implementa la logica di detection del traffico
 
 /**
@@ -8,7 +8,8 @@ import DetectionService from "../detection/DetectionService"; // import del serv
  */
 export async function detect(
   req: Request,
-  res: Response
+  res: Response,
+  next: NextFunction
 ) {
 
   // blocco try-catch per la gestione degli errori di analisi
@@ -18,8 +19,7 @@ export async function detect(
     const result = await DetectionService.analyze(req.body);
     // Express poi restituisce il risultato dell'analisi in formato JSON
     res.json(result);
-  } catch {
-    // in caso di errore restituisce una risposta HTTP 500
-    res.status(500).json({ error: "Errore durante l'analisi del traffico" });
+  } catch (error) {
+    next(error); // se si verifica uun errore durante l'analisi, l'errore viene inoltrato all'errorMiddleware tramite next() da Express
   }
 }

@@ -11,7 +11,9 @@ participant "RuleBasedClassifier" as Classifier
 participant "DecisionService" as Decision
 participant "TrafficAnalysisRepository" as AnalysisRepo
 participant "BlockedIpRepository" as BlockedRepo
+participant "errorMiddleware" as errorMiddleware
 database "SQLite" as DB
+
 
 Client -> Route : POST /api/detection\nsourceIp, packets, bytes, synPacketsCount
 Route -> Validation : valida campi richiesta
@@ -49,6 +51,11 @@ else Campi presenti
             DB --> BlockedRepo : OK
         end
 
+        alt Errore durante l'analisi 
+        Service --> Controller : eccezione
+        Controller --> errorMiddleware : next(error)
+        errorMiddleware --> Client : HTTP 500
+        else Analisi completata
         Service --> Controller : classification + decision
         Controller --> Client : 200 OK + JSON response
     end

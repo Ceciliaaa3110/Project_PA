@@ -47,15 +47,30 @@ Le informazioni salvate possono essere consultate attraverso rotte protette rise
 ### Diagramma di sequenza
 
 #### Rotta /api/auth/login
-![Sequenza login](sequenzaLogin.png)
+<p align="center">
+<img src="sequenzaLogin.png" width="100%">
+</p>
+
 #### Rotta /api/detection
-![Sequenza login](sequenzaDetection.png)
+<p align="center">
+<img src="sequenzaDetection.png" width="100%">
+</p>
+
 #### Rotta /api/admin/statistics
-![Sequenza login](sequenzaAdminStatistics.png)
+<p align="center">
+<img src="sequenzaAdminStatistics.png" width="100%">
+</p>
+
 #### Rotta /api/admin/analysis
-![Sequenza login](sequenzaAdminAnalysis.png)
+<p align="center">
+<img src="sequenzaAdminAnalysis.png" width="100%">
+</p>
+
 #### Rotta /api/admin/cache
-![Sequenza login](sequenzaAdminCache.png)
+<p align="center">
+<img src="sequenzaAdminCache.png" width="100%">
+</p>
+
 
 ## Design Pattern utilizzati
 

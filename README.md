@@ -106,7 +106,7 @@ Se durante l'elaborazione si verifica un'eccezione, questa viene inoltrata all'`
 
 Questa rotta consente ad un amministratore autenticato di recuperare le statistiche del sistema.
 Il flusso di esecuzione della rotta è il seguente:
-- Il client (Admin/Postman) invia una richiesta GET all'endpoint `/api/admin/statistics`, includendo il Bearer Token nell'header Authorization
+- Il client (Admin/Postman) invia una richiesta GET all'endpoint `/api/admin/statistics`, includendo il Bearer Token nella sezione _Authorization_
 - La richiesta viene intercettata da `adminRoutes`, che la inoltra all'`authMiddleware`
 - L'`authMiddleware` verifica la validità del token JWT:
   - se il token è assente o non valido, la richiesta viene interrotta e il server restituisce una risposta `HTTP 401 Unauthorized`.
@@ -120,6 +120,21 @@ Il flusso di esecuzione della rotta è il seguente:
 <p align="center">
 <img src="diagrammi/sequenzaAdminAnalysis.png" width="100%">
 </p>
+
+Questa rotta consente ad un amministratore autenticato di visualizzare tutte le analisi del traffico memorizzate nel database.
+Il flusso di esecuzione della rotta è il seguente:
+- Il client invia una richiesta GET all'endpoint `/api/admin/analysis`, includendo il Bearer Token nella sezione _Authorization_
+- La richiesta viene intercettata da `adminRoutes`, che la inoltra all'`authMiddleware`
+- L'`authMiddleware` verifica la validità del token JWT:
+  - se il token è assente o non valido, la richiesta viene interrotta e il server restituisce una risposta `HTTP 401 Unauthorized`
+  - se il token è valido, l'`authMiddleware` decodifica il token, salva le informazioni dell'utente in `req.user` e richiama il metodo `next()` per proseguire l'elaborazione della richiesta
+- La richiesta viene quindi inoltrata al `roleMiddleware`, che verifica che l'utente possieda il ruolo ADMIN:
+  - se l'utente non è autorizzato, il server restituisce una risposta `HTTP 403 Forbidden` 
+  - se l'utente possiede il ruolo ADMIN, il `roleMiddleware` richiama il metodo `next()` e inoltra la richiesta all'`AdminController`
+- L'`AdminController` richiama il metodo `findAll()` del `TrafficAnalysisRepository`: tale metodo esegue una query `SELECT` sul database SQLite per recuperare tutte le analisi del traffico memorizzate
+- L'elenco delle analisi viene quindi restituito all'`AdminController`, che poi invia al client una risposta `HTTP 200 OK` contenente la lista delle analisi in formato JSON.
+
+
 
 #### Rotta /api/admin/cache
 <p align="center">

@@ -67,9 +67,9 @@ Il flusso di esecuzione della rotta è il seguente:
 - L'`AuthController` estrae le credenziali dalla richiesta e richiama il metodo `login()` dell'`AuthService`
 - L'`AuthService` utilizza il `UserRepository` per cercare l'utente nel database SQLite tramite il metodo `findByUsername()`
 - Lo `UserRepository` esegue una query sul database e restituisce i dati dell'utente, eventualmente presente; se l'utente non esiste
-il server restituisce una risposta `HTTP 401 Unauthorized`
-- L'`AuthService` quindi verifica che la password fornita corrisponda a quella memorizzata nel database
-- Se le credenziali sono corrette, viene generato un JWT token e il server restituisce una risposta `HTTP 200 OK` contenente il token; se invece le credenziali non sono valide, viene restituita una risposta `HTTP 401 Unauthorized`.
+il server restituisce un'eccezione `Credenziali non valide`
+- L'`AuthService` quindi verifica che la password fornita corrisponda a quella memorizzata nel database tramite il metodo `bcrypt.compare()`
+- Se le credenziali sono corrette, viene generato un JWT token e il server restituisce una risposta `HTTP 200 OK` contenente il token; se invece le credenziali non sono valide, viene restituita un'eccezione `Credenziali non valide`
 
 
 

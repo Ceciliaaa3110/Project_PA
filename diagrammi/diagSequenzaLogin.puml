@@ -20,8 +20,8 @@ alt Credenziali valide
     Service --> Controller : JWT token
     Controller --> Client : 200 OK + token
 else Credenziali non valide
-    Service --> Controller : errore login
-    Controller --> Client : 401 Unauthorized
+    Service --> Controller : throw Error("Credenziali non valide")
+    Controller --> Client : errore autenticazione
 end
 
 @enduml

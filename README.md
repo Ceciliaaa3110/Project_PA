@@ -12,7 +12,7 @@ Nello specifico, sono state selezionate quattro features:
 - **bytes**, ovvero la quantità totale di bytes trasmessi nella comunicazione tra client (host) e service;
 - **synPacketsCount**, cioè l numero di pacchetti TCP che possiedono la flag SYN, che costituisce una caratteristica rilevante nell'osservazione del traffico di rete, per individuare attacchi SYN Flood;
 
-Nello specifico, il backend riceve le richieste tramite API REST sviluppate con Node.js, Express e TypeScript, quindi verifica autenticazione e autorizzazione mediante JWT, e poi valida i dati ricevuti e avvia la pipeline di elaborazione.
+Nello specifico, il backend riceve le richieste tramite API REST sviluppate con Node.js, Express e TypeScript, quindi verifica autenticazione e autorizzazione mediante token JWT, e poi valida i dati ricevuti e avvia la pipeline di elaborazione.
 
 Il traffico viene classificato tramite un approccio rule-based, basato su regole e soglie predefinite, distinguendo tra:
 - traffico benigno
@@ -59,17 +59,21 @@ const response = pm.response.json();
 pm.environment.set("token", response.token);
 ```
 In questo modo, tutte le richieste protette da eseguire successivamente possono utilizzare automaticamente il token, senza la necessità di 
-inserirlo manualmente nella sezione _Authorization_.
+inserirlo manualmente nell'_header Authorization_.
+L'_header Authorization_ è uno degli header della richiesta HTTP che il client invia, e serve per trasmettere le credenziali di autenticazione al server; nello specifico, contiene il token JWT nello schema Bearer definito dallo standard
+```bash
+Authorization: Bearer <JWT>
+```
 
 Il flusso di esecuzione della rotta è il seguente:
-- Il client (Postman) invia una richiesta POST all'endpoint `/api/auth/login`, contenente username e password
+- Il client (Postman) invia una richiesta `POST` all'endpoint `/api/auth/login`, contenente username e password
 - La richiesta viene intercettata da `authRoutes`, che la inoltra al metodo `login()` dell'`AuthController`
 - L'`AuthController` estrae le credenziali dalla richiesta e richiama il metodo `login()` dell'`AuthService`
 - L'`AuthService` utilizza il `UserRepository` per cercare l'utente nel database SQLite tramite il metodo `findByUsername()`
 - Lo `UserRepository` esegue una query sul database e restituisce i dati dell'utente, eventualmente presente; se l'utente non esiste
 il server restituisce un'eccezione `Credenziali non valide`
 - L'`AuthService` quindi verifica che la password fornita corrisponda a quella memorizzata nel database tramite il metodo `bcrypt.compare()`
-- Se le credenziali sono corrette, viene generato un JWT token e il server restituisce una risposta `HTTP 200 OK` contenente il token; se invece le credenziali non sono valide, viene restituita un'eccezione `Credenziali non valide`
+- Se le credenziali sono corrette, viene generato un token JWT e il server restituisce una risposta `HTTP 200 OK` contenente il token; se invece le credenziali non sono valide, viene restituita un'eccezione `Credenziali non valide`
 
 
 
@@ -80,7 +84,7 @@ il server restituisce un'eccezione `Credenziali non valide`
 
 Questa rotta riceve i dati di traffico provenienti dal client e li analizza per individuare eventuali attacchi di rete.
 Il flusso di esecuzione della rotta è il seguente:
-- Il client invia una richiesta POST all'endpoint `/api/detection`
+- Il client invia una richiesta `POST` all'endpoint `/api/detection`
 - La richiesta viene intercettata da `detectionRoutes`, che la inoltra al `validationMiddleware`
 - Il `validationMiddlewar`e verifica che tutti i campi obbligatori siano presenti; se alcuni parametri mancano, la richiesta viene interrotta e viene restituita una risposta `HTTP 400 Bad Request`. Se la validazione ha esito positivo, la richiesta viene inoltrata al `DetectionController`
 - Il `DetectionController` richiama il metodo `analyze()` del `DetectionService`
@@ -106,7 +110,7 @@ Se durante l'elaborazione si verifica un'eccezione, questa viene inoltrata all'`
 
 Questa rotta consente ad un amministratore autenticato di recuperare le statistiche del sistema.
 Il flusso di esecuzione della rotta è il seguente:
-- Il client (Admin/Postman) invia una richiesta GET all'endpoint `/api/admin/statistics`, includendo il Bearer Token nella sezione _Authorization_
+- Il client (Admin/Postman) invia una richiesta `GET` all'endpoint `/api/admin/statistics`, includendo il Bearer Token nell'_header Authorization_
 - La richiesta viene intercettata da `adminRoutes`, che la inoltra all'`authMiddleware`
 - L'`authMiddleware` verifica la validità del token JWT:
   - se il token è assente o non valido, la richiesta viene interrotta e il server restituisce una risposta `HTTP 401 Unauthorized`.
@@ -123,7 +127,7 @@ Il flusso di esecuzione della rotta è il seguente:
 
 Questa rotta consente ad un amministratore autenticato di visualizzare tutte le analisi del traffico memorizzate nel database.
 Il flusso di esecuzione della rotta è il seguente:
-- Il client invia una richiesta GET all'endpoint `/api/admin/analysis`, includendo il Bearer Token nella sezione _Authorization_
+- Il client invia una richiesta `GET` all'endpoint `/api/admin/analysis`, includendo il Bearer Token nell'_header Authorization_
 - La richiesta viene intercettata da `adminRoutes`, che la inoltra all'`authMiddleware`
 - L'`authMiddleware` verifica la validità del token JWT:
   - se il token è assente o non valido, la richiesta viene interrotta e il server restituisce una risposta `HTTP 401 Unauthorized`
@@ -140,6 +144,18 @@ Il flusso di esecuzione della rotta è il seguente:
 <p align="center">
 <img src="diagrammi/sequenzaAdminCache.png" width="100%">
 </p>
+
+Questa rotta consente ad un amministratore autenticato di svuotare la cache utilizzata dal sistema.
+Il flusso di esecuzione della rotta è il seguente:
+- Il client invia una richiesta `DELETE` all'endpoint `/api/admin/cache`, includendo il Bearer Token nell'_header Authorization_
+- La richiesta viene intercettata da `adminRoutes`, che la inoltra all'`authMiddleware` per verificare la validità del token JWT:
+  - se il token è assente o non valido, la richiesta viene interrotta e il server restituisce una risposta `HTTP 401 Unauthorized`
+  - se il token è valido, l'`authMiddleware` decodifica il token, salva le informazioni dell'utente in `req.user` e richiama il metodo `next()` per proseguire l'elaborazione della richiesta
+- La richiesta viene quindi inoltrata al `roleMiddleware`, che verifica che l'utente possieda il ruolo ADMIN:
+  - se l'utente non è autorizzato, il server restituisce una risposta `HTTP 403 Forbidden` 
+  - se l'utente possiede il ruolo ADMIN, il `roleMiddleware` richiama il metodo `next()` e inoltra la richiesta all'`AdminController`, che a sua volta richiama il metodo `clearCache()` dell'`AdminService`
+- L'`AdminService` richiama il metodo `clear()` del `CacheManagerService`, che fa sì che tutti i dati memorizzati nella cache vengano eliminati. La conferma dell'operazione viene poi inoltrata all'`AdminService` che a sua volta restituisce l'esito all'`AdminController`
+- L'`AdminController`, quindi, invia al client una risposta `HTTP 200 OK` contenente il messaggio `"Cache svuotata"`
 
 
 ## Design Pattern utilizzati

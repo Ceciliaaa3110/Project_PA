@@ -78,6 +78,27 @@ il server restituisce un'eccezione `Credenziali non valide`
 <img src="diagrammi/sequenzaDetection.png" width="100%">
 </p>
 
+Questa rotta riceve i dati di traffico provenienti dal client e li analizza per individuare eventuali attacchi di rete.
+Il flusso di esecuzione della rotta è il seguente:
+- Il client invia una richiesta POST all'endpoint `/api/detection`
+- La richiesta viene intercettata da `detectionRoutes`, che la inoltra al `validationMiddleware`
+- Il `validationMiddlewar`e verifica che tutti i campi obbligatori siano presenti; se alcuni parametri mancano, la richiesta viene interrotta e viene restituita una risposta `HTTP 400 Bad Request`. Se la validazione ha esito positivo, la richiesta viene inoltrata al `DetectionController`.
+- Il `DetectionController` richiama il metodo `analyze()` del `DetectionService`.
+- Il `DetectionService` verifica, tramite il `CacheManagerService`, se l'indirizzo IP sorgente è già temporaneamente bloccato tramite il metodo `isBlocked()`. Di qui possono verificarsi due casi:
+  - Caso 1 – IP già bloccato
+    Se l'IP risulta già presente nella cache dei blocchi temporanei, il servizio restituisce immediatamente l'esito `BLOCKED + TEMP_BLOCK`, ed il client riceve una risposta `HTTP 200 OK` contenente l'esito.
+  - Caso 2 – IP non bloccato
+  Il `DetectionService` aggiorna il contatore delle richieste dell'IP sorgente attraverso il metodo `updateRequestCount()` del `CacheManagerService`, e successivamente invia i dati al `RuleBasedClassifier`, che esegue la classificazione del traffico.
+  Quindi, il risultato della classificazione viene passato al `DecisionService` che determina la decisione finale ad esso associata.
+  L'analisi effettuata viene poi salvata nel database tramite il `TrafficAnalysisRepository`.
+  Se la decisione finale corrisponde a `TEMP_BLOCK`, il `BlockedIpRepository` salva anche le informazioni relative al blocco dell'indirizzo IP.
+  Infine il `DetectionService` restituisce al `DetectionController` la classificazione e la decisione ottenute, che vengono inviate al client in formato JSON con risposta `HTTP 200 OK`.
+
+Se durante l'elaborazione si verifica un'eccezione, questa viene inoltrata all'`errorMiddleware`, che restituisce una risposta `HTTP 500 Internal Server Error`.
+
+
+
+
 #### Rotta /api/admin/statistics
 <p align="center">
 <img src="diagrammi/sequenzaAdminStatistics.png" width="100%">

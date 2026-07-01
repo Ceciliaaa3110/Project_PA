@@ -162,7 +162,7 @@ Quindi aprire un secondo terminale, posizionandosi nella cartella `backend`, per
 ```bash
 npm run simulate
 ```
-Aprire **Postman** e importare la collection `ProjectPA.postman_collection.json`: da Postman è possibile inviare le richieste agli endpoint dell'applicazione.
+Aprire **Postman** e importare la collection `Project_collection.json`: da Postman è possibile inviare le richieste agli endpoint dell'applicazione.
 
 
 

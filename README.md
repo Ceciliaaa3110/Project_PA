@@ -303,16 +303,16 @@ cd backend
 ```bash
 docker compose build --no-cache
 ```
-4. avvio dei servizi definiti nel file `docker-compose.yml`
+5. avvio dei servizi definiti nel file `docker-compose.yml`
 ```bash
 docker compose up
 ```
 
-Quindi aprire un secondo terminale, posizionandosi nella cartella `backend`, per poi eseguire il simulatore di traffico
+6. aprire un secondo terminale, posizionandosi nella cartella `backend`, per poi eseguire il simulatore di traffico
 ```bash
 npm run simulate
 ```
-Aprire **Postman** e importare la collection `Project_collection.json`: da Postman è possibile inviare le richieste agli endpoint dell'applicazione.
+7. aprire **Postman** e importare la collection `Project_collection.json`: da Postman è possibile inviare le richieste agli endpoint dell'applicazione.
 
 
 

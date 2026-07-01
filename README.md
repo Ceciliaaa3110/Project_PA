@@ -70,10 +70,10 @@ Il flusso di esecuzione della rotta è il seguente:
 - La richiesta viene intercettata da `authRoutes`, che la inoltra al metodo `login()` dell'`AuthController`
 - L'`AuthController` estrae le credenziali dalla richiesta e richiama il metodo `login()` dell'`AuthService`
 - L'`AuthService` utilizza il `UserRepository` per cercare l'utente nel database SQLite tramite il metodo `findByUsername()`
-- Lo `UserRepository` esegue una query sul database e restituisce i dati dell'utente, eventualmente presente; se l'utente non esiste
+- Lo `UserRepository` esegue una query sul database e restituisce i dati dell'utente eventualmente presente; se l'utente non esiste
 il server restituisce un'eccezione `Credenziali non valide`
 - L'`AuthService` quindi verifica che la password fornita corrisponda a quella memorizzata nel database tramite il metodo `bcrypt.compare()`
-- Se le credenziali sono corrette, viene generato un token JWT e il server restituisce una risposta `HTTP 200 OK` contenente il token; se invece le credenziali non sono valide, viene restituita un'eccezione `Credenziali non valide`
+- Se le credenziali sono corrette, viene generato un token JWT e il server restituisce una risposta `HTTP 200 OK` contenente il token; se invece le credenziali non sono valide, viene restituita un'eccezione contenente il messaggio `Credenziali non valide`
 
 
 
@@ -90,13 +90,14 @@ Il flusso di esecuzione della rotta è il seguente:
 - Il `DetectionController` richiama il metodo `analyze()` del `DetectionService`
 - Il `DetectionService` verifica, tramite il `CacheManagerService`, se l'indirizzo IP sorgente è già temporaneamente bloccato tramite il metodo `isBlocked()`. Di qui possono verificarsi due casi:
   - Caso 1 – IP già bloccato
-    Se l'IP risulta già presente nella cache dei blocchi temporanei, il servizio restituisce immediatamente l'esito `BLOCKED + TEMP_BLOCK`, ed il client riceve una risposta `HTTP 200 OK` contenente l'esito
+    se l'IP risulta già presente nella cache dei blocchi temporanei, il servizio restituisce immediatamente l'esito `BLOCKED + TEMP_BLOCK`, ed il client riceve una risposta `HTTP 200 OK` contenente l'esito
+
   - Caso 2 – IP non bloccato
-  Il `DetectionService` aggiorna il contatore delle richieste dell'IP sorgente attraverso il metodo `updateRequestCount()` del `CacheManagerService`, e successivamente invia i dati al `RuleBasedClassifier`, che esegue la classificazione del traffico.
-  Quindi, il risultato della classificazione viene passato al `DecisionService` che determina la decisione finale ad esso associata.
-  L'analisi effettuata viene poi salvata nel database tramite il `TrafficAnalysisRepository`.
-  Se la decisione finale corrisponde a `TEMP_BLOCK`, il `BlockedIpRepository` salva anche le informazioni relative al blocco dell'indirizzo IP.
-  Infine il `DetectionService` restituisce al `DetectionController` la classificazione e la decisione ottenute, che vengono inviate al client in formato JSON con risposta `HTTP 200 OK`.
+    Il `DetectionService` aggiorna il contatore delle richieste dell'IP sorgente attraverso il metodo `updateRequestCount()` del `CacheManagerService`, e successivamente invia i dati al `RuleBasedClassifier`, che esegue la classificazione del traffico.
+    Quindi, il risultato della classificazione viene passato al `DecisionService` che determina la decisione finale ad esso associata.
+    L'analisi effettuata viene poi salvata nel database tramite il `TrafficAnalysisRepository`.
+    Se la decisione finale corrisponde a `TEMP_BLOCK`, il `BlockedIpRepository` salva anche le informazioni relative al blocco dell'indirizzo IP.
+    Infine il `DetectionService` restituisce al `DetectionController` la classificazione e la decisione ottenute, che vengono inviate al client in formato JSON con risposta `HTTP 200 OK`.
 
 Se durante l'elaborazione si verifica un'eccezione, questa viene inoltrata all'`errorMiddleware`, che restituisce una risposta `HTTP 500 Internal Server Error`.
 

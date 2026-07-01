@@ -51,6 +51,28 @@ Le informazioni salvate possono essere consultate attraverso rotte protette rise
 <img src="diagrammi/sequenzaLogin.png" width="100%">
 </p>
 
+Questa rotta autentica l'utente verificando username e password forniti.
+Se le credenziali inserite sono corrette, il server genera e restituisce un token JWT.
+Nella collection Postman è stato configurato uno **script Post-response** che, al termine di un login eseguito con successo, estrae automaticamente il token della risposta e lo salva nella variabile `token` contenuta nell'Environment: 
+```bash
+const response = pm.response.json();
+pm.environment.set("token", response.token);
+```
+In questo modo, tutte le richieste protette da eseguire successivamente possono utilizzare automaticamente il token, senza la necessità di 
+inserirlo manualmente nella sezione _Authorization_.
+
+Il flusso di esecuzione della rotta è il seguente:
+- Il client (Postman) invia una richiesta POST all'endpoint `/api/auth/login`, contenente username e password
+- La richiesta viene intercettata da `authRoutes`, che la inoltra al metodo `login()` dell'`AuthController`
+- L'`AuthController` estrae le credenziali dalla richiesta e richiama il metodo `login()` dell'`AuthService`
+- L'`AuthService` utilizza il `UserRepository` per cercare l'utente nel database SQLite tramite il metodo `findByUsername()`
+- Lo `UserRepository` esegue una query sul database e restituisce i dati dell'utente, eventualmente presente; se l'utente non esiste
+il server restituisce una risposta `HTTP 401 Unauthorized`
+- L'`AuthService` quindi verifica che la password fornita corrisponda a quella memorizzata nel database
+- Se le credenziali sono corrette, viene generato un JWT token e il server restituisce una risposta `HTTP 200 OK` contenente il token; se invece le credenziali non sono valide, viene restituita una risposta `HTTP 401 Unauthorized`.
+
+
+
 #### Rotta /api/detection
 <p align="center">
 <img src="diagrammi/sequenzaDetection.png" width="100%">
@@ -178,9 +200,10 @@ Il file `seedUsers.ts` inizializza il database `database.sqlite` creando, in cas
 
 Il file `TrafficSimulator.ts` genera il traffico di rete simulato.
 
-Il file `Project_collection.json` contiene la collection di richieste HTTP già configurate, per testare automaticamente le API del progetto.
+Il file `Project_collection.json` contiene la Collection Postman di richieste HTTP già configurate, per testare automaticamente le API del progetto.
 
-Il file `Project_PA.postman_environment.json` contiene le variabili utilizzate dalla collection, ovvero l'indirizzo del server (baseURL) e i token di autenticazione per le rotte amministrative. La definizione di questo environment permette di modificare i volori in esso contenuti senza dover riaggiornare manualmente tutte le richieste contenute nella collection.
+Il file `Project_PA.postman_environment.json` contiene le variabili utilizzate dalla collection, ovvero l'indirizzo del server (`baseURL`) e i token di autenticazione per le rotte amministrative (`token`). La definizione di questo Environment permette di modificare i volori in esso contenuti senza dover riaggiornare manualmente tutte le richieste contenute nella Collection.
+
 
 ## Test
 

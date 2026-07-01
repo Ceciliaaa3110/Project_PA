@@ -121,6 +121,62 @@ Il flusso di esecuzione della rotta è il seguente:
   - se l'utente è un amministratore, il roleMiddleware richiama next() e inoltra la richiesta all'AdminController
 - L'`AdminController` richiama quindi il metodo `getAllStatistics()` del `CacheManagerService` per recuperare le statistiche memorizzate nella cache. Tali statistiche verranno poi restituite all'`AdminController`, che invierà al client una risposta `HTTP 200 OK` contenente le relative statistiche.
 
+La **cache** è stata realizzata tramite una `Map`, una struttura dati nativa di JavaScrpt basata su coppie _chiave-valore_
+```bash
+private cache = new Map<string, CacheEntry>();
+```
+- la _chiave_ è rappresentata dall'indirizzo Ip sorgente del traffico inviato
+- il _valore_ è associato alla variabile `CacheEntry`, contenente il numero di richieste effettuate dall'Ip ed eventualmente la data di scadenza del blocco temporaneo
+
+
+Nel contesto di questo progetto, la gestione della cache è stata affidata al metodo  `updateRequestCount` che recupera il record associato all'indirizzo IP mediante il metodo `this.cache.get(sourceIp)`: se l'IP non è ancora presente, viene creato un nuovo CacheEntry con il contatore delle richieste effettuale inizializzato a zero. 
+Successivamente il numero di richieste viene incrementato, e la cache viene aggiornata tramite il metodo `this.cache.set(sourceIp, current)`.
+```bash
+updateRequestCount(sourceIp: string): CacheEntry {
+    
+    const current = this.cache.get(sourceIp) || { requestCount: 0 };
+
+    current.requestCount += 1;
+    this.cache.set(sourceIp, current);
+    return current;
+  }
+```
+
+Il metodo `isBlocked()`, invece, consulta la Map per verificare se l'indirizzo IP è presente e se il blocco temporaneo risulta ancora valido.
+
+```bash
+isBlocked(sourceIp: string): boolean {
+    
+    const entry = this.cache.get(sourceIp);
+
+    if (!entry) {
+      return false;
+    }
+    // se l'ip è presente in cache ma non esiste una data di scadenza, allora l'ip è ancora autorizzato
+    if (!entry.blockedUntil) {
+      return false;
+    }
+    return entry.blockedUntil > new Date();
+  }
+```
+
+Il metodo `blockTemporarily` ...
+
+```bash
+blockTemporarily(sourceIp: string, minutes: number = 5): void {
+    
+    const entry = this.cache.get(sourceIp) || { requestCount: 0 };
+
+    const blockedUntil = new Date();
+
+    blockedUntil.setMinutes(blockedUntil.getMinutes() + minutes);
+
+    entry.blockedUntil = blockedUntil;
+
+    this.cache.set(sourceIp, entry);
+  }
+```
+
 #### Rotta /api/admin/analysis
 <p align="center">
 <img src="diagrammi/sequenzaAdminAnalysis.png" width="100%">

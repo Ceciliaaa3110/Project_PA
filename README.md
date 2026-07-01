@@ -142,7 +142,12 @@ updateRequestCount(sourceIp: string): CacheEntry {
   }
 ```
 
-Il metodo `isBlocked()`, invece, consulta la Map per verificare se l'indirizzo IP è presente e se il blocco temporaneo risulta ancora valido.
+Il metodo `isBlocked()` ha il compito di verificare se un determinato indirizzo IP risulta attualmente soggetto ad un blocco temporaneo. 
+
+Per farlo, consulta la Map tramite il metodo `this.cache.get(sourceIp)`, recuperando il `CacheEntry` associato all'indirizzo Ip:
+-  se il record non è presente nella cache, allora l'IP non è mai stato bloccato e il metodo restituisce `false`
+-  se invece il record esiste ma il campo `blockedUntil` non è presente, l'indirizzo Ip non è soggetto ad alcun blocco attivo e viene anche in questo caso restituito `false`
+-  se il record è presente nella cache e presenta una data di scadenza del blocco, il metodo `new Date()` confronta tale valore con la data e l'ora correnti, e se il campo `blockedUntil` è successivo all'istante corrente, significa che il blocco è ancora valido; in questo scenario il metodo restituisce `true`, mentre altrimenti restituisce `false` consentendo ancora in futuro l'elaborazione delle richieste provenienti da quell'indirizzo IP.
 
 ```bash
 isBlocked(sourceIp: string): boolean {
@@ -152,7 +157,6 @@ isBlocked(sourceIp: string): boolean {
     if (!entry) {
       return false;
     }
-    // se l'ip è presente in cache ma non esiste una data di scadenza, allora l'ip è ancora autorizzato
     if (!entry.blockedUntil) {
       return false;
     }
@@ -160,7 +164,10 @@ isBlocked(sourceIp: string): boolean {
   }
 ```
 
-Il metodo `blockTemporarily` ...
+Il metodo `blockTemporarily()` viene richiamato quando il `DecisionService` stabilisce che un indirizzo Ip deve essere bloccato temporaneamente.
+Servendosi del metodo `this.cache.get(sourceIp)` recupera il record associato all'indirizzo IP, e se questo non è ancora presente nella Map, viene creato un nuovo `CacheEntry`.
+Successivamente viene creato un nuovo oggetto `Date`, al quale vengono aggiunti 5 minuti di blocco mediante il metodo `setMinutes()`, e la data ottenuta viene salvata nel campo `blockedUntil` del relativo `CacheEntry`.
+Infine, il record aggiornato viene memorizzato nuovamente nella Map tramite il metodo `this.cache.set(sourceIp, entry)`.
 
 ```bash
 blockTemporarily(sourceIp: string, minutes: number = 5): void {

@@ -178,6 +178,10 @@ Il file `seedUsers.ts` inizializza il database `database.sqlite` creando, in cas
 
 Il file `TrafficSimulator.ts` genera il traffico di rete simulato.
 
+Il file `Project_collection.json` contiene la collection di richieste HTTP già configurate, per testare automaticamente le API del progetto.
+
+Il file `Project_PA.postman_environment.json` contiene le variabili utilizzate dalla collection, ovvero l'indirizzo del server (baseURL) e i token di autenticazione per le rotte amministrative. La definizione di questo environment permette di modificare i volori in esso contenuti senza dover riaggiornare manualmente tutte le richieste contenute nella collection.
+
 ## Test
 
 ### Test middleware con JEST

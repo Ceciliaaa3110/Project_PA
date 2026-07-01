@@ -41,34 +41,34 @@ Le informazioni salvate possono essere consultate attraverso rotte protette rise
 
 ### Diagramma dei casi d'uso
 
-![Diagramma casi d'uso](diagrammaCasiUso.png)
+![Diagramma casi d'uso](diagrammi/diagrammaCasiUso.png)
 
 
 ### Diagramma di sequenza
 
 #### Rotta /api/auth/login
 <p align="center">
-<img src="sequenzaLogin.png" width="100%">
+<img src="diagrammi/sequenzaLogin.png" width="100%">
 </p>
 
 #### Rotta /api/detection
 <p align="center">
-<img src="sequenzaDetection.png" width="100%">
+<img src="diagrammi/sequenzaDetection.png" width="100%">
 </p>
 
 #### Rotta /api/admin/statistics
 <p align="center">
-<img src="sequenzaAdminStatistics.png" width="100%">
+<img src="diagrammi/sequenzaAdminStatistics.png" width="100%">
 </p>
 
 #### Rotta /api/admin/analysis
 <p align="center">
-<img src="sequenzaAdminAnalysis.png" width="100%">
+<img src="diagrammi/sequenzaAdminAnalysis.png" width="100%">
 </p>
 
 #### Rotta /api/admin/cache
 <p align="center">
-<img src="sequenzaAdminCache.png" width="100%">
+<img src="diagrammi/sequenzaAdminCache.png" width="100%">
 </p>
 
 
@@ -202,7 +202,7 @@ I middleware scelti per questa tipologia di testing sono i seguenti:
 
 L'immagine seguente mostra il superamento di entrambe le suite di test implementate, per un totale di quattro test superati.
 
-![Test JEST](EsecuzionetestJest.png)
+![Test JEST](diagrammi/EsecuzionetestJest.png)
 
 ### Test API
 

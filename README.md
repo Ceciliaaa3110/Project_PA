@@ -1,7 +1,7 @@
 # Sistema multi-utente per il rilevamento di attacchi di rete basato su architettura client-server
 
 Il sistema sviluppato si inserisce in un contesto applicativo in cui è necessario monitorare il traffico di rete per individuare possibili attività sospette.
-Nell'infrastruttura ipotizzata, infatti, più client o utenti possono generare traffico verso un backend centrale, mentre un sistema di analisi si occupa di elaborare i flussi ricevuti e segnalare eventuali comportamenti anomali.
+Nell'infrastruttura ipotizzata, più client o utenti possono generare traffico verso un backend centrale, mentre un sistema di analisi si occupa di elaborare i flussi ricevuti e segnalare eventuali comportamenti anomali.
 
 ## Obiettivo del progetto
 

@@ -60,7 +60,7 @@ pm.environment.set("token", response.token);
 ```
 In questo modo, tutte le richieste protette da eseguire successivamente possono utilizzare automaticamente il token, senza la necessità di 
 inserirlo manualmente nell'_header Authorization_.
-L'_header Authorization_ è uno degli header della richiesta HTTP che il client invia, e serve per trasmettere le credenziali di autenticazione al server; nello specifico, contiene il token JWT nello schema Bearer definito dallo standard
+L'_header Authorization_ è uno degli header della richiesta HTTP che il client invia, e serve per trasmettere le credenziali di autenticazione al server; nello specifico, contiene il token utilizzando lo schema Bearer definito dallo standard HTTP
 ```bash
 Authorization: Bearer <JWT>
 ```

@@ -82,11 +82,11 @@ Questa rotta riceve i dati di traffico provenienti dal client e li analizza per 
 Il flusso di esecuzione della rotta è il seguente:
 - Il client invia una richiesta POST all'endpoint `/api/detection`
 - La richiesta viene intercettata da `detectionRoutes`, che la inoltra al `validationMiddleware`
-- Il `validationMiddlewar`e verifica che tutti i campi obbligatori siano presenti; se alcuni parametri mancano, la richiesta viene interrotta e viene restituita una risposta `HTTP 400 Bad Request`. Se la validazione ha esito positivo, la richiesta viene inoltrata al `DetectionController`.
-- Il `DetectionController` richiama il metodo `analyze()` del `DetectionService`.
+- Il `validationMiddlewar`e verifica che tutti i campi obbligatori siano presenti; se alcuni parametri mancano, la richiesta viene interrotta e viene restituita una risposta `HTTP 400 Bad Request`. Se la validazione ha esito positivo, la richiesta viene inoltrata al `DetectionController`
+- Il `DetectionController` richiama il metodo `analyze()` del `DetectionService`
 - Il `DetectionService` verifica, tramite il `CacheManagerService`, se l'indirizzo IP sorgente è già temporaneamente bloccato tramite il metodo `isBlocked()`. Di qui possono verificarsi due casi:
   - Caso 1 – IP già bloccato
-    Se l'IP risulta già presente nella cache dei blocchi temporanei, il servizio restituisce immediatamente l'esito `BLOCKED + TEMP_BLOCK`, ed il client riceve una risposta `HTTP 200 OK` contenente l'esito.
+    Se l'IP risulta già presente nella cache dei blocchi temporanei, il servizio restituisce immediatamente l'esito `BLOCKED + TEMP_BLOCK`, ed il client riceve una risposta `HTTP 200 OK` contenente l'esito
   - Caso 2 – IP non bloccato
   Il `DetectionService` aggiorna il contatore delle richieste dell'IP sorgente attraverso il metodo `updateRequestCount()` del `CacheManagerService`, e successivamente invia i dati al `RuleBasedClassifier`, che esegue la classificazione del traffico.
   Quindi, il risultato della classificazione viene passato al `DecisionService` che determina la decisione finale ad esso associata.
@@ -103,6 +103,18 @@ Se durante l'elaborazione si verifica un'eccezione, questa viene inoltrata all'`
 <p align="center">
 <img src="diagrammi/sequenzaAdminStatistics.png" width="100%">
 </p>
+
+Questa rotta consente ad un amministratore autenticato di recuperare le statistiche del sistema.
+Il flusso di esecuzione della rotta è il seguente:
+- Il client (Admin/Postman) invia una richiesta GET all'endpoint `/api/admin/statistics`, includendo il Bearer Token nell'header Authorization
+- La richiesta viene intercettata da `adminRoutes`, che la inoltra all'`authMiddleware`
+- L'`authMiddleware` verifica la validità del token JWT:
+  - se il token è assente o non valido, la richiesta viene interrotta e il server restituisce una risposta `HTTP 401 Unauthorized`.
+  - se il token è valido, l'`authMiddleware` decodifica il token, salva le informazioni dell'utente in `req.user` e richiama  la funzione `next()` per proseguire l'elaborazione della richiesta
+- La richiesta viene quindi inoltrata al `roleMiddleware`, che verifica che l'utente abbia il ruolo ADMIN:
+  - se l'utente non possiede il ruolo richiesto, il server restituisce una risposta `HTTP 403 Forbidden`
+  - se l'utente è un amministratore, il roleMiddleware richiama next() e inoltra la richiesta all'AdminController
+- L'`AdminController` richiama quindi il metodo `getAllStatistics()` del `CacheManagerService` per recuperare le statistiche memorizzate nella cache. Tali statistiche verranno poi restituite all'`AdminController`, che invierà al client una risposta `HTTP 200 OK` contenente le relative statistiche.
 
 #### Rotta /api/admin/analysis
 <p align="center">

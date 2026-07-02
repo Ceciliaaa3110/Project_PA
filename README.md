@@ -46,6 +46,18 @@ Le informazioni salvate possono essere consultate attraverso rotte protette rise
 
 ### Diagramma di sequenza
 
+## Introduzione alle API
+Prima di analizzare nel dettaglio il funzioanamento delle singole rotte mediante i daigrammi di sequenza, di seguito si riporta una tabella che ne riassume le principali caratteristiche.
+
+| Metodo | Endpoint | Gestore richiesta HTTP | Descrizione | Autenticazione |
+|--------|----------|------------|-------------|----------------|
+| POST | /api/auth/login | AuthController | Autenticazione utente e rilascio JWT | No |
+| POST | /api/detection | detectionController | Classificazione del traffico di rete | No |
+| GET | /api/admin/statistics | AdminController | Restituisce le statistiche aggregate | JWT Admin |
+| GET | /api/admin/analysis | AdminController | Restituisce lo storico delle analisi | JWT Admin |
+| DELETE | /api/admin/cache | AdminController | Svuota la cache delle statistiche | JWT Admin |
+
+
 #### Rotta /api/auth/login
 <p align="center">
 <img src="diagrammi/sequenzaLogin.png" width="100%">

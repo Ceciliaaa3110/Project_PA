@@ -120,7 +120,7 @@ Se durante l'elaborazione si verifica un'eccezione, questa viene inoltrata all'`
 <img src="diagrammi/sequenzaAdminStatistics.png" width="100%">
 </p>
 
-Questa rotta consente ad un amministratore autenticato di recuperare le statistiche del sistema.
+Questa rotta consente ad un amministratore autenticato di visualizzare lo stato degli indirizzi Ip monitorati dal sistema.
 Il flusso di esecuzione della rotta è il seguente:
 - Il client (Admin/Postman) invia una richiesta `GET` all'endpoint `/api/admin/statistics`, includendo il Bearer Token nell'_header Authorization_
 - La richiesta viene intercettata da `adminRoutes`, che la inoltra all'`authMiddleware`

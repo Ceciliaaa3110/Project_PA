@@ -53,9 +53,9 @@ Prima di analizzare nel dettaglio il funzioanamento delle singole rotte mediante
 |--------|----------|------------|-------------|----------------|
 | POST | /api/auth/login | Autenticazione utente e rilascio JWT | No | AuthController |
 | POST | /api/detection | Classificazione del traffico di rete | No | detectionController |
-| GET | /api/admin/statistics | Restituisce le statistiche aggregate | JWT Admin | AdminController |
-| GET | /api/admin/analysis | Restituisce lo storico delle analisi | JWT Admin | AdminController |
-| DELETE | /api/admin/cache | Svuota la cache delle statistiche | JWT Admin | AdminController |
+| GET | /api/admin/statistics | Restituisce le statistiche aggregate | JWT | AdminController |
+| GET | /api/admin/analysis | Restituisce lo storico delle analisi | JWT | AdminController |
+| DELETE | /api/admin/cache | Svuota la cache delle statistiche | JWT | AdminController |
 
 
 #### Rotta /api/auth/login

@@ -46,16 +46,15 @@ Le informazioni salvate possono essere consultate attraverso rotte protette rise
 
 ### Diagramma di sequenza
 
-## Introduzione alle API
 Prima di analizzare nel dettaglio il funzioanamento delle singole rotte mediante i daigrammi di sequenza, di seguito si riporta una tabella che ne riassume le principali caratteristiche.
 
 | Metodo | Endpoint | Descrizione | Autenticazione | Gestore richiesta HTTP |
 |--------|----------|------------|-------------|----------------|
-| POST | /api/auth/login | Autenticazione utente e rilascio JWT | No | AuthController |
-| POST | /api/detection | Classificazione del traffico di rete | No | detectionController |
-| GET | /api/admin/statistics | Restituisce le statistiche aggregate | JWT | AdminController |
-| GET | /api/admin/analysis | Restituisce lo storico delle analisi | JWT | AdminController |
-| DELETE | /api/admin/cache | Svuota la cache delle statistiche | JWT | AdminController |
+| `POST` | `/api/auth/login` | Verifica le credenziali dell'utente e genera un token JWT | No | AuthController |
+| `POST` | `/api/detection` | Riceve i dati di traffico e ne restituisce la classificazione e la decisone | No | detectionController |
+| `GET` | `/api/admin/statistics` | Restituisce il numero di richieste e l'eventuale stato di blocco temporaneo associato a ciascun Ip monitorato presente in cache | JWT | AdminController |
+| `GET` | `/api/admin/analysis` | Restituisce l'elenco delle analisi di traffico memorizzate nel database | JWT | AdminController |
+| `DELETE` | `/api/admin/cache` | Svuota la cache del sistema | JWT | AdminController |
 
 
 #### Rotta /api/auth/login
@@ -131,7 +130,7 @@ Il flusso di esecuzione della rotta è il seguente:
 - La richiesta viene quindi inoltrata al `roleMiddleware`, che verifica che l'utente abbia il ruolo ADMIN:
   - se l'utente non possiede il ruolo richiesto, il server restituisce una risposta `HTTP 403 Forbidden`
   - se l'utente è un amministratore, il roleMiddleware richiama next() e inoltra la richiesta all'AdminController
-- L'`AdminController` richiama quindi il metodo `getAllStatistics()` del `CacheManagerService` per recuperare le statistiche memorizzate nella cache. Tali statistiche verranno poi restituite all'`AdminController`, che invierà al client una risposta `HTTP 200 OK` contenente le relative statistiche.
+- L'`AdminController` richiama quindi il metodo `getAllStatistics()` del `CacheManagerService` per recuperare le statistiche degli indirizzi Ip monitorati (numero di richieste effettuate, evetnuale stato di blocco temporaneo), memorizzate nella cache. Tali statistiche verranno poi restituite all'`AdminController`, che invierà al client una risposta `HTTP 200 OK` contenente le relative statistiche.
 
 La **cache** è stata realizzata tramite una `Map`, una struttura dati nativa di JavaScrpt basata su coppie _chiave-valore_
 ```bash
